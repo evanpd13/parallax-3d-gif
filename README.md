@@ -1,8 +1,8 @@
 # Parallax 3D GIF Generator
 
-Turn any single image into a 3D parallax GIF. Uses monocular depth estimation, AI segmentation, and neural inpainting to separate foreground from background, then renders an orbital camera motion with realistic parallax.
+Turn any single image into a 3D parallax GIF. Uses monocular depth estimation, AI segmentation, and neural inpainting to separate the scene into multiple depth layers, then renders smooth sub-pixel orbital camera motion with realistic parallax.
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/YOUR_USERNAME/parallax-3d-gif/blob/main/parallax_3d_gif.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/evanpd13/parallax-3d-gif/blob/main/parallax_3d_gif.ipynb)
 
 ## Pipeline
 
@@ -10,8 +10,8 @@ Turn any single image into a 3D parallax GIF. Uses monocular depth estimation, A
 |-------|---------------|--------------|
 | 1. Depth | [Depth Anything V2](https://huggingface.co/depth-anything/Depth-Anything-V2-Small-hf) | Monocular depth estimation |
 | 2. Segmentation | [RMBG-2.0](https://huggingface.co/briaai/RMBG-2.0) | Foreground/background separation |
-| 3. Inpainting | [LaMa](https://github.com/enesmsahin/simple-lama-inpainting) | Fill in the background behind the subject |
-| 4. Rendering | Custom orbital warper | Parallax shift with z-buffering and ambient occlusion |
+| 3. Inpainting | [LaMa](https://github.com/enesmsahin/simple-lama-inpainting) | Multi-layer backing plates with aggressive mask dilation |
+| 4. Rendering | `cv2.remap` sub-pixel warper | Back-to-front layer compositing with bilinear interpolation |
 | 5. Assembly | Pillow | Ping-pong GIF output |
 
 ## Quick Start (Colab)
@@ -34,6 +34,7 @@ Edit the config cell to tune the effect:
 | `MAX_DIM` | 2048 | Max image dimension |
 | `BG_PARALLAX` | 2.5 | Background shift multiplier |
 | `BG_BLUR` | 3 | Depth-of-field blur on background |
+| `NUM_LAYERS` | 4 | Depth layers (more = smoother parallax, slower inpainting) |
 | `MASK_DILATE_K` | 21 | Inpaint mask dilation kernel size |
 | `MASK_DILATE_I` | 5 | Inpaint mask dilation iterations |
 
