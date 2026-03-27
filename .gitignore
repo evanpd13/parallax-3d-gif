@@ -1,0 +1,26 @@
+# Outputs
+*.gif
+*.png
+*.jpg
+*.jpeg
+frames/
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment
+.env
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
