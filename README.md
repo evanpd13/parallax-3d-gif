@@ -34,7 +34,7 @@ Edit the config cell to tune the effect:
 | `MAX_DIM` | 2048 | Max image dimension |
 | `BG_PARALLAX` | 2.5 | Background shift multiplier |
 | `BG_BLUR` | 3 | Depth-of-field blur on background |
-| `NUM_LAYERS` | 4 | Depth layers (more = smoother parallax, slower inpainting) |
+| `NUM_LAYERS` | 10 | Depth layers (more = smoother parallax, fewer inpaint artifacts) |
 | `MASK_DILATE_K` | 21 | Inpaint mask dilation kernel size |
 | `MASK_DILATE_I` | 5 | Inpaint mask dilation iterations |
 
