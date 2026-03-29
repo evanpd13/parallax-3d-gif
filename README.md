@@ -8,18 +8,18 @@ Turn any single image into a 3D parallax GIF. Uses monocular depth estimation, A
 
 | Stage | Model / Method | What it does |
 |-------|---------------|--------------|
-| 1. Depth | [Depth Anything V2](https://huggingface.co/depth-anything/Depth-Anything-V2-Small-hf) | Monocular depth estimation |
-| 2. Segmentation | [RMBG-2.0](https://huggingface.co/briaai/RMBG-2.0) | Foreground/background separation |
-| 3. Inpainting | [LaMa](https://github.com/enesmsahin/simple-lama-inpainting) | Multi-layer backing plates with aggressive mask dilation |
-| 4. Rendering | `cv2.remap` sub-pixel warper | Back-to-front layer compositing with bilinear interpolation |
-| 5. Assembly | Pillow | Ping-pong GIF output |
+| 1. Depth | [Depth Anything V2 **Large**](https://huggingface.co/depth-anything/Depth-Anything-V2-Large-hf) (335M params) | High-fidelity monocular depth estimation with bilateral refinement |
+| 2. Segmentation | [RMBG-2.0](https://huggingface.co/briaai/RMBG-2.0) + edge-aware matting | Foreground/background separation with guided-filter alpha refinement |
+| 3. Inpainting | [LaMa](https://github.com/enesmsahin/simple-lama-inpainting) + depth-adaptive DoF | Multi-layer backing plates with continuous depth-of-field blur |
+| 4. Rendering | `cv2.remap` Lanczos4 + sinusoidal easing | Back-to-front compositing with 8×8 kernel interpolation and natural camera motion |
+| 5. Assembly | Pillow + ffmpeg | Optimized GIF (median-cut quantization) + H.264 MP4 output |
 
 ## Quick Start (Colab)
 
 1. Click the **Open in Colab** badge above
 2. Run all cells
 3. Upload an image when prompted
-4. Download the generated 3D GIF
+4. Download the generated 3D GIF and MP4
 
 ## Configuration
 
@@ -29,19 +29,20 @@ Edit the config cell to tune the effect:
 |-----------|---------|-------------|
 | `FRAMES` | 9 | Number of viewpoints to render |
 | `ARC_DEG` | 7.0 | Total camera arc in degrees |
-| `FPS` | 12 | GIF frame rate |
+| `FPS` | 12 | GIF/MP4 frame rate |
 | `PING_PONG` | True | Bounce animation back and forth |
 | `MAX_DIM` | 2048 | Max image dimension |
 | `BG_PARALLAX` | 2.5 | Background shift multiplier |
-| `BG_BLUR` | 3 | Depth-of-field blur on background |
+| `BG_BLUR` | 3 | Depth-of-field blur intensity on background |
 | `NUM_LAYERS` | 10 | Depth layers (more = smoother parallax, fewer inpaint artifacts) |
 | `MASK_DILATE_K` | 21 | Inpaint mask dilation kernel size |
 | `MASK_DILATE_I` | 5 | Inpaint mask dilation iterations |
+| `DEPTH_MODEL` | `depth-anything/Depth-Anything-V2-Large-hf` | Depth model (override to `Small-hf` for weaker GPUs) |
 
 ## Requirements
 
 - Python 3.8+
-- CUDA GPU (recommended, runs on CPU but slowly)
+- CUDA GPU (A100 recommended for Large depth model; T4 works with `DEPTH_MODEL='depth-anything/Depth-Anything-V2-Small-hf'`)
 - Hugging Face account (for model access)
 
 Install locally:
@@ -52,11 +53,12 @@ pip install -r requirements.txt
 
 ## Outputs
 
-- `*_3d.gif` — the parallax GIF
+- `*_3d.gif` — the parallax GIF (optimized quantization)
+- `*_3d.mp4` — H.264 MP4 (no color banding, full quality)
 - `depth.png` — depth map visualization
 - `mask.png` — foreground segmentation mask
 - `bg_inpainted.png` — inpainted background
-- `frames/` — individual PNG frames
+- `frames/` — individual PNG frames (for lenticular interlacing)
 
 ## License
 
